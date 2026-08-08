@@ -16,13 +16,20 @@
 </head>
 <body>
 
+    <!-- LIQUID GLASS FILTER POOL
+         Populated at runtime by liquid-glass.js: for every [data-lg] element
+         a dedicated <filter> (feImage displacement map + feDisplacementMap +
+         specular feBlend) is generated here, sized to that element's real
+         shape (see liquid-glass.js for the Snell's-law refraction math). -->
+    <svg id="lg-defs-root" width="0" height="0" style="position:absolute;pointer-events:none"></svg>
+
     <!-- DYNAMIC BACKGROUND -->
     <canvas id="bgc"></canvas>
     <div class="bg-over"></div>
     <div class="bg-grain"></div>
 
     <!-- ▌MOBILE BOTTOM NAV ▐ -->
-    <nav id="mob-nav">
+    <nav id="mob-nav" data-lg data-lg-bezel="18" data-lg-strength="1" data-lg-spec="0.55">
         <button class="mn-btn on" data-v="home" onclick="gv('home',this)">
             <svg class="mn-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M2 8L10 2l8 6V18H13V13H7v5H2V8Z"/>
@@ -88,13 +95,13 @@
                             <circle cx="6" cy="6" r="4"/>
                             <path d="M9.5 9.5L13 13"/>
                         </svg>
-                        <input class="srch-inp" id="q-home" type="text" placeholder="YouTube 음악 검색..."
+                        <input class="srch-inp" id="q-home" type="text" placeholder="YouTube 음악 검색..." data-lg data-lg-bezel="10" data-lg-spec="0.4"
                                oninput="onSuggest(this,'sug-home')"
                                onkeydown="if(event.key==='Enter'){hideSug('sug-home');doSearch(this.value)}"
                                onfocus="if(this.value.trim())onSuggest(this,'sug-home')"
                                onblur="setTimeout(()=>hideSug('sug-home'),200)">
                         <button class="srch-btn" onclick="doSearch(document.getElementById('q-home').value)">검색</button>
-                        <div class="sug-drop" id="sug-home"></div>
+                        <div class="sug-drop" id="sug-home" data-lg data-lg-bezel="12" data-lg-spec="0.35"></div>
                     </div>
 
                     <div class="sh">
@@ -127,13 +134,13 @@
                             <circle cx="6" cy="6" r="4"/>
                             <path d="M9.5 9.5L13 13"/>
                         </svg>
-                        <input class="srch-inp" id="q-s" type="text" placeholder="YouTube 음악 검색..."
+                        <input class="srch-inp" id="q-s" type="text" placeholder="YouTube 음악 검색..." data-lg data-lg-bezel="10" data-lg-spec="0.4"
                                oninput="onSuggest(this,'sug-s')"
                                onkeydown="if(event.key==='Enter'){hideSug('sug-s');doSearch(this.value)}"
                                onfocus="if(this.value.trim())onSuggest(this,'sug-s')"
                                onblur="setTimeout(()=>hideSug('sug-s'),200)">
                         <button class="srch-btn" onclick="doSearch(document.getElementById('q-s').value)">검색</button>
-                        <div class="sug-drop" id="sug-s"></div>
+                        <div class="sug-drop" id="sug-s" data-lg data-lg-bezel="12" data-lg-spec="0.35"></div>
                     </div>
                     <div id="s-res">
                         <div class="state">
@@ -228,7 +235,7 @@
         </main>
 
         <!-- ▌MINI PLAYER BAR ▐ -->
-        <div id="bar" class="bar-hidden">
+        <div id="bar" class="bar-hidden" data-lg data-lg-bezel="18" data-lg-strength="1" data-lg-spec="0.5">
             <div class="bar-inner">
                 <img id="b-art" class="bt-art" src="" alt="" onclick="openNP()">
                 <div class="bt-m" onclick="openNP()">
@@ -266,14 +273,14 @@
         <div class="np-vignette"></div>
         <canvas id="np-particles"></canvas>
 
-        <button class="np-x" onclick="closeNP()">
+        <button class="np-x" onclick="closeNP()" data-lg data-lg-bezel="10" data-lg-spec="0.6">
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.9" stroke-linecap="round">
                 <line x1="1.5" y1="1.5" x2="11.5" y2="11.5"/>
                 <line x1="11.5" y1="1.5" x2="1.5" y2="11.5"/>
             </svg>
         </button>
 
-        <button class="np-fs-btn" id="np-fs-btn" onclick="toggleNpFullscreen()">
+        <button class="np-fs-btn" id="np-fs-btn" onclick="toggleNpFullscreen()" data-lg data-lg-bezel="10" data-lg-spec="0.6">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8" stroke-linecap="round">
                 <path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5"/>
             </svg>
@@ -333,21 +340,21 @@
                         <polyline points="17,13 19,15 17,17"/>
                     </svg>
                 </button>
-                <button class="nc" onclick="prevT()">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-                        <polygon points="22,4 10,14 22,24" fill="currentColor" stroke="none"/>
-                        <line x1="6" y1="4" x2="6" y2="24"/>
-                    </svg>
-                </button>
+<button class="nc" onclick="prevT()">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="6" width="2.5" height="20" rx="1.2" fill="currentColor" stroke="none"/>
+        <path d="M27 7 C27 7 12 16 27 25"/>
+    </svg>
+</button>
                 <button class="nc nc-play" id="nc-play" onclick="togglePlay()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="#08080d"><polygon points="7,4 20,12 7,20"/></svg>
                 </button>
-                <button class="nc" onclick="nextT()">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-                        <polygon points="6,4 18,14 6,24" fill="currentColor" stroke="none"/>
-                        <line x1="22" y1="4" x2="22" y2="24"/>
-                    </svg>
-                </button>
+<button class="nc" onclick="nextT()">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="24.5" y="6" width="2.5" height="20" rx="1.2" fill="currentColor" stroke="none"/>
+        <path d="M5 7 C5 7 20 16 5 25"/>
+    </svg>
+</button>
                 <button class="nc" id="nc-rep" onclick="toggleRep()">
                     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
                         <polyline points="1,5 4,2 7,5"/>
@@ -370,11 +377,6 @@
                         <path d="M9.5 4a4 4 0 0 1 0 6M12 2a7 7 0 0 1 0 10"/>
                     </svg>
                 </div>
-                <div class="np-echo">
-                    <span class="np-elbl">Echo</span>
-                    <input type="range" class="np-sl" id="np-echo-sl" min="0" max="100" value="0"
-                           oninput="setEcho(+this.value);document.getElementById('echo-sl-bar').value=this.value">
-                </div>
             </div>
         </div>
 
@@ -390,7 +392,7 @@
     <audio id="local-audio" preload="auto" style="display:none"></audio>
 
     <!-- Playlist context menu -->
-    <div id="pl-ctx-menu">
+    <div id="pl-ctx-menu" data-lg data-lg-bezel="14" data-lg-spec="0.4">
         <div class="pl-ctx-title">플레이리스트에 추가</div>
         <div id="pl-ctx-list"></div>
         <div class="pl-ctx-divider"></div>
@@ -405,7 +407,7 @@
 
     <!-- Custom dialog -->
     <div id="pl-dialog-overlay" onclick="plDialogCancel()">
-        <div id="pl-dialog" onclick="event.stopPropagation()">
+        <div id="pl-dialog" onclick="event.stopPropagation()" data-lg data-lg-bezel="20" data-lg-spec="0.4">
             <div class="pl-dialog-title" id="pl-dialog-title">플레이리스트 이름</div>
             <input class="pl-dialog-input" id="pl-dialog-input" type="text" placeholder="이름을 입력하세요"
                    onkeydown="if(event.key==='Enter')plDialogConfirm();if(event.key==='Escape')plDialogCancel()">
@@ -418,7 +420,7 @@
 
     <!-- Confirm dialog -->
     <div id="pl-confirm-overlay" onclick="plConfirmCancel()">
-        <div id="pl-confirm" onclick="event.stopPropagation()">
+        <div id="pl-confirm" onclick="event.stopPropagation()" data-lg data-lg-bezel="20" data-lg-spec="0.4">
             <div class="pl-dialog-title" id="pl-confirm-title">삭제하시겠어요?</div>
             <div class="pl-confirm-msg" id="pl-confirm-msg"></div>
             <div class="pl-dialog-btns">
@@ -430,7 +432,7 @@
 
     <!-- Playlist track add modal -->
     <div id="pl-add-modal-overlay" onclick="plAddModalClose()">
-        <div id="pl-add-modal" onclick="event.stopPropagation()">
+        <div id="pl-add-modal" onclick="event.stopPropagation()" data-lg data-lg-bezel="20" data-lg-spec="0.4">
             <div class="pl-add-modal-header">
                 <span class="pl-add-modal-title">곡 추가</span>
                 <button class="pl-add-modal-close" onclick="plAddModalClose()">
@@ -456,12 +458,13 @@
         </div>
     </div>
 
-    <div id="toast"></div>
+    <div id="toast" data-lg data-lg-bezel="16" data-lg-spec="0.45"></div>
 
     <input type="range" id="vol-sl" min="0" max="100" value="80" style="display:none" oninput="setVol(+this.value)">
     <input type="range" id="echo-sl-bar" min="0" max="100" value="0" style="display:none" oninput="setEcho(+this.value)">
     <input type="range" id="echo-sl" min="0" max="100" value="0" style="display:none" oninput="setEcho(+this.value)">
 
+    <script src="liquid-glass.js"></script>
     <script src="app.js"></script>
 
     <!-- AndroidBridge 준비 후 홈 추천 로드 -->
