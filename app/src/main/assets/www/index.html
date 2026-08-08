@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>SYNC</title>
+    <!-- Noto Sans KR: 한글 깨짐 방지 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+
+    <!-- DYNAMIC BACKGROUND -->
+    <canvas id="bgc"></canvas>
+    <div class="bg-over"></div>
+    <div class="bg-grain"></div>
+
+    <!-- ▌MOBILE BOTTOM NAV ▐ -->
+    <nav id="mob-nav">
+        <button class="mn-btn on" data-v="home" onclick="gv('home',this)">
+            <svg class="mn-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 8L10 2l8 6V18H13V13H7v5H2V8Z"/>
+            </svg>
+            <span>홈</span>
+        </button>
+        <button class="mn-btn" data-v="search" onclick="gv('search',this)">
+            <svg class="mn-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                <circle cx="9" cy="9" r="6"/>
+                <path d="M13.5 13.5L18 18"/>
+            </svg>
+            <span>검색</span>
+        </button>
+        <button class="mn-btn" data-v="fav" onclick="gv('fav',this)">
+            <svg class="mn-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                <path d="M10 16.5S3 12 3 7.5a3.5 3.5 0 0 1 7-1A3.5 3.5 0 0 1 17 7.5C17 12 10 16.5 10 16.5z"/>
+            </svg>
+            <span>즐겨찾기</span>
+        </button>
+        <button class="mn-btn" data-v="queue" onclick="gv('queue',this)">
+            <svg class="mn-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                <line x1="3" y1="5" x2="17" y2="5"/>
+                <line x1="3" y1="10" x2="12" y2="10"/>
+                <line x1="3" y1="15" x2="15" y2="15"/>
+            </svg>
+            <span>대기열</span>
+        </button>
+        <button class="mn-btn" data-v="playlists" onclick="gv('playlists',this)">
+            <svg class="mn-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="7" height="7" rx="1.5"/>
+                <rect x="11" y="2" width="7" height="7" rx="1.5"/>
+                <rect x="2" y="11" width="7" height="7" rx="1.5"/>
+                <path d="M11 14.5h7M14.5 11v7"/>
+            </svg>
+            <span>플레이리스트</span>
+        </button>
+    </nav>
+
+    <!-- ▌MAIN CONTENT AREA ▐ -->
+    <div id="shell">
+        <main id="main">
+
+            <!-- HOME VIEW -->
+            <div class="view on" id="v-home">
+                <div class="view-inner">
+                    <div class="mob-header">
+                        <div class="mob-logo">
+                            <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                                <rect x="1.5" y="11" width="3" height="6" rx="1.5" fill="white"/>
+                                <rect x="6.5" y="7" width="3" height="14" rx="1.5" fill="white"/>
+                                <rect x="11.5" y="4" width="3" height="20" rx="1.5" fill="white"/>
+                                <rect x="16.5" y="8" width="3" height="12" rx="1.5" fill="white"/>
+                                <rect x="21.5" y="12" width="3" height="4" rx="1.5" fill="white"/>
+                            </svg>
+                            <span class="mob-logo-word">SYNC</span>
+                        </div>
+                        <h2 id="greet-h" class="mob-greet">안녕하세요</h2>
+                        <p class="mob-greet-sub">오늘은 어떤 음악을 들을까요?</p>
+                    </div>
+
+                    <div class="mob-srch-wrap">
+                        <svg class="srch-ico" width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round">
+                            <circle cx="6" cy="6" r="4"/>
+                            <path d="M9.5 9.5L13 13"/>
+                        </svg>
+                        <input class="srch-inp" id="q-home" type="text" placeholder="YouTube 음악 검색..."
+                               oninput="onSuggest(this,'sug-home')"
+                               onkeydown="if(event.key==='Enter'){hideSug('sug-home');doSearch(this.value)}"
+                               onfocus="if(this.value.trim())onSuggest(this,'sug-home')"
+                               onblur="setTimeout(()=>hideSug('sug-home'),200)">
+                        <button class="srch-btn" onclick="doSearch(document.getElementById('q-home').value)">검색</button>
+                        <div class="sug-drop" id="sug-home"></div>
+                    </div>
+
+                    <div class="sh">
+                        <h3>추천 음악 ✦</h3>
+                        <span class="sh-more" onclick="loadRec('pop music 2024 official','rec-row')">새로고침</span>
+                    </div>
+                    <div class="hrow" id="rec-row">
+                        <div class="state" style="padding:28px 16px"><div class="spinner"></div></div>
+                    </div>
+
+                    <div class="sh">
+                        <h3>지금 인기 🔥</h3>
+                        <span class="sh-more" onclick="loadRec('kpop 2024 mv official','hot-row')">새로고침</span>
+                    </div>
+                    <div class="hrow" id="hot-row">
+                        <div class="state" style="padding:28px 16px"><div class="spinner"></div></div>
+                    </div>
+                    <div style="height:24px"></div>
+                </div>
+            </div>
+
+            <!-- SEARCH VIEW -->
+            <div class="view" id="v-search">
+                <div class="view-inner">
+                    <div class="mob-header">
+                        <h2 class="view-title">검색</h2>
+                    </div>
+                    <div class="mob-srch-wrap">
+                        <svg class="srch-ico" width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round">
+                            <circle cx="6" cy="6" r="4"/>
+                            <path d="M9.5 9.5L13 13"/>
+                        </svg>
+                        <input class="srch-inp" id="q-s" type="text" placeholder="YouTube 음악 검색..."
+                               oninput="onSuggest(this,'sug-s')"
+                               onkeydown="if(event.key==='Enter'){hideSug('sug-s');doSearch(this.value)}"
+                               onfocus="if(this.value.trim())onSuggest(this,'sug-s')"
+                               onblur="setTimeout(()=>hideSug('sug-s'),200)">
+                        <button class="srch-btn" onclick="doSearch(document.getElementById('q-s').value)">검색</button>
+                        <div class="sug-drop" id="sug-s"></div>
+                    </div>
+                    <div id="s-res">
+                        <div class="state">
+                            <svg width="40" height="40" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="19" cy="19" r="12"/><path d="M31 31L41 41"/></svg>
+                            <h3>음악을 검색하세요</h3>
+                            <p>YouTube에서 바로 찾아 재생할 수 있어요</p>
+                        </div>
+                    </div>
+                    <div style="height:24px"></div>
+                </div>
+            </div>
+
+            <!-- FAVORITES VIEW -->
+            <div class="view" id="v-fav">
+                <div class="view-inner">
+                    <div class="mob-header"><h2 class="view-title">즐겨찾기</h2></div>
+                    <div class="cgrid" id="fav-grid">
+                        <div class="state" style="grid-column:1/-1">
+                            <svg width="40" height="40" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                                <path d="M22 38S6 28 6 18a9 9 0 0 1 16-5.6A9 9 0 0 1 38 18C38 28 22 38 22 38z"/>
+                            </svg>
+                            <h3>즐겨찾기가 비었어요</h3>
+                            <p>카드의 ♡ 버튼으로 추가하세요</p>
+                        </div>
+                    </div>
+                    <div style="height:24px"></div>
+                </div>
+            </div>
+
+            <!-- QUEUE VIEW -->
+            <div class="view" id="v-queue">
+                <div class="view-inner">
+                    <div class="mob-header"><h2 class="view-title">재생 대기열</h2></div>
+                    <div id="q-list">
+                        <div class="state">
+                            <svg width="40" height="40" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                                <path d="M6 11h32M6 22h22M6 33h28"/>
+                            </svg>
+                            <h3>대기열 없음</h3>
+                        </div>
+                    </div>
+                    <div style="height:24px"></div>
+                </div>
+            </div>
+
+            <!-- PLAYLISTS VIEW -->
+            <div class="view" id="v-playlists">
+                <div class="view-inner">
+                    <div id="pl-list-view">
+                        <div class="mob-header">
+                            <div style="display:flex;justify-content:space-between;align-items:center">
+                                <h2 class="view-title">플레이리스트</h2>
+                                <button class="pl-new-btn" onclick="plNewPrompt()">
+                                    <svg width="12" height="12" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                        <line x1="6.5" y1="1" x2="6.5" y2="12"/>
+                                        <line x1="1" y1="6.5" x2="12" y2="6.5"/>
+                                    </svg>
+                                    새 플레이리스트
+                                </button>
+                            </div>
+                        </div>
+                        <div id="pl-grid"></div>
+                    </div>
+                    <div id="pl-detail-view" style="display:none">
+                        <div class="mob-header">
+                            <button class="pl-back-btn" onclick="plShowList()">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9,2 4,7 9,12"/>
+                                </svg>
+                                뒤로
+                            </button>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+                                <button class="sh-more" onclick="plPlayAll()">전체 재생</button>
+                                <button class="pl-add-track-btn" onclick="plAddModalOpen()">+ 곡 추가</button>
+                                <button class="sh-more" onclick="plRenamePrompt()" style="color:var(--t3)">이름 변경</button>
+                                <button class="sh-more" onclick="plDeleteCurrent()" style="color:#ff5f57">삭제</button>
+                            </div>
+                        </div>
+                        <div class="pl-detail-header">
+                            <div class="pl-detail-cover" id="pl-detail-cover"></div>
+                            <div class="pl-detail-meta">
+                                <div class="pl-detail-name" id="pl-detail-name"></div>
+                                <div class="pl-detail-count" id="pl-detail-count"></div>
+                            </div>
+                        </div>
+                        <div id="pl-track-list"></div>
+                    </div>
+                    <div style="height:24px"></div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ▌MINI PLAYER BAR ▐ -->
+        <div id="bar" class="bar-hidden">
+            <div class="bar-inner">
+                <img id="b-art" class="bt-art" src="" alt="" onclick="openNP()">
+                <div class="bt-m" onclick="openNP()">
+                    <div id="b-title" class="bt-title">—</div>
+                    <div id="b-ch" class="bt-ch">재생 중인 곡 없음</div>
+                </div>
+                <button class="bt-fav" id="b-fav" onclick="favCur()">
+                    <svg width="18" height="18" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                        <path d="M7.5 12.5S2 8.8 2 5.5a3 3 0 0 1 5.5-1.65A3 3 0 0 1 13 5.5C13 8.8 7.5 12.5 7.5 12.5z"/>
+                    </svg>
+                </button>
+                <div class="vizz off" id="vizz">
+                    <div class="vb"></div><div class="vb"></div><div class="vb"></div>
+                    <div class="vb"></div><div class="vb"></div>
+                </div>
+                <button class="cb cb-play bar-play" id="cb-play" onclick="togglePlay()">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="currentColor"><polygon points="4,2.5 14,8.5 4,14.5"/></svg>
+                </button>
+                <button class="cb bar-next" onclick="nextT()">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                        <polygon points="4,3 12,8.5 4,14" fill="currentColor" stroke="none"/>
+                        <line x1="13" y1="3" x2="13" y2="14"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="bar-prog"><div class="bar-prog-fill" id="bar-prog-fill"></div></div>
+        </div>
+
+    </div>
+
+    <!-- ▌NOW PLAYING OVERLAY ▐ -->
+    <div id="np">
+        <canvas id="np-bg"></canvas>
+        <div class="np-grain"></div>
+        <div class="np-vignette"></div>
+        <canvas id="np-particles"></canvas>
+
+        <button class="np-x" onclick="closeNP()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.9" stroke-linecap="round">
+                <line x1="1.5" y1="1.5" x2="11.5" y2="11.5"/>
+                <line x1="11.5" y1="1.5" x2="1.5" y2="11.5"/>
+            </svg>
+        </button>
+
+        <button class="np-fs-btn" id="np-fs-btn" onclick="toggleNpFullscreen()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8" stroke-linecap="round">
+                <path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5"/>
+            </svg>
+        </button>
+        
+        <div class="np-art-area">
+            <div class="np-art-shell" id="np-ash">
+                <img id="np-art" src="" alt="">
+                <div class="np-vinyl-ring" id="np-vinyl"></div>
+                <div class="np-art-glow" id="np-art-glow"></div>
+                <div class="np-pulse" id="np-pulse"></div>
+            </div>
+            <div class="np-lyrics-panel" id="np-lyrics-panel">
+                <div class="np-lyrics-scroll" id="np-lyrics-scroll">
+                    <div class="np-lyrics-inner" id="np-lyrics-inner"></div>
+                </div>
+                <div class="np-lyrics-fade-top"></div>
+                <div class="np-lyrics-fade-bot"></div>
+            </div>
+        </div>
+
+        <div class="np-panel">
+            <div class="np-info-row">
+                <div class="np-meta">
+                    <div id="np-title" class="np-title">—</div>
+                    <div id="np-ch" class="np-ch">—</div>
+                </div>
+                <button class="np-act" id="np-fav" onclick="favCur()">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-linecap="round">
+                        <path d="M11 18.5S3 13.5 3 8.5a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 19 8.5C19 13.5 11 18.5 11 18.5z"/>
+                    </svg>
+                </button>
+                <button class="np-act" id="np-save" onclick="saveLocalMusic()" title="로컬 저장">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 2v9M7 8l4 4 4-4M4 16.5v2a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 18 18.5v-2"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="np-prog-wrap">
+                <div class="np-pb" id="np-pb">
+                    <div class="np-pf" id="np-pf"></div>
+                    <div class="np-pd" id="np-pd"></div>
+                </div>
+                <div class="np-times">
+                    <span class="np-t" id="np-cur">0:00</span>
+                    <span class="np-t" id="np-tot">0:00</span>
+                </div>
+            </div>
+
+            <div class="np-ctrl">
+                <button class="nc" id="nc-sh" onclick="toggleShuf()">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                        <path d="M3 7h3a6 6 0 0 1 5 2.7l.3.3M19 7h-3a6 6 0 0 0-5 2.7l-.3.3"/>
+                        <path d="M3 15h3a6 6 0 0 0 5-2.7l.3-.3M19 15h-3a6 6 0 0 1-5-2.7l-.3-.3"/>
+                        <polyline points="17,5 19,7 17,9"/>
+                        <polyline points="17,13 19,15 17,17"/>
+                    </svg>
+                </button>
+                <button class="nc" onclick="prevT()">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <polygon points="22,4 10,14 22,24" fill="currentColor" stroke="none"/>
+                        <line x1="6" y1="4" x2="6" y2="24"/>
+                    </svg>
+                </button>
+                <button class="nc nc-play" id="nc-play" onclick="togglePlay()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#08080d"><polygon points="7,4 20,12 7,20"/></svg>
+                </button>
+                <button class="nc" onclick="nextT()">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <polygon points="6,4 18,14 6,24" fill="currentColor" stroke="none"/>
+                        <line x1="22" y1="4" x2="22" y2="24"/>
+                    </svg>
+                </button>
+                <button class="nc" id="nc-rep" onclick="toggleRep()">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                        <polyline points="1,5 4,2 7,5"/>
+                        <path d="M4 2v9a5 5 0 0 0 5 5h5"/>
+                        <polyline points="21,17 18,20 15,17"/>
+                        <path d="M18 20v-9a5 5 0 0 0-5-5H8"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="np-bottom-row">
+                <div class="np-vol">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.3" stroke-linecap="round">
+                        <path d="M2 5H0.5v4H2l3 2.5v-9L2 5z"/>
+                    </svg>
+                    <input type="range" class="np-sl" id="np-vol-sl" min="0" max="100" value="80"
+                           oninput="setVol(+this.value);document.getElementById('vol-sl').value=this.value">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.3" stroke-linecap="round">
+                        <path d="M2 5H0.5v4H2l3 2.5v-9L2 5z"/>
+                        <path d="M9.5 4a4 4 0 0 1 0 6M12 2a7 7 0 0 1 0 10"/>
+                    </svg>
+                </div>
+                <div class="np-echo">
+                    <span class="np-elbl">Echo</span>
+                    <input type="range" class="np-sl" id="np-echo-sl" min="0" max="100" value="0"
+                           oninput="setEcho(+this.value);document.getElementById('echo-sl-bar').value=this.value">
+                </div>
+            </div>
+        </div>
+
+        <div id="np-fs-lyrics">
+            <div id="np-fs-lyrics-inner"></div>
+        </div>
+    </div>
+
+    <!-- ▌YOUTUBE PLAYER (hidden) ▐ -->
+    <div id="yt-player-wrap">
+        <div id="yt-player"></div>
+    </div>
+    <audio id="local-audio" preload="auto" style="display:none"></audio>
+
+    <!-- Playlist context menu -->
+    <div id="pl-ctx-menu">
+        <div class="pl-ctx-title">플레이리스트에 추가</div>
+        <div id="pl-ctx-list"></div>
+        <div class="pl-ctx-divider"></div>
+        <button class="pl-ctx-item pl-ctx-new" onclick="plCtxNew()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <line x1="6" y1="1" x2="6" y2="11"/>
+                <line x1="1" y1="6" x2="11" y2="6"/>
+            </svg>
+            새 플레이리스트 만들기
+        </button>
+    </div>
+
+    <!-- Custom dialog -->
+    <div id="pl-dialog-overlay" onclick="plDialogCancel()">
+        <div id="pl-dialog" onclick="event.stopPropagation()">
+            <div class="pl-dialog-title" id="pl-dialog-title">플레이리스트 이름</div>
+            <input class="pl-dialog-input" id="pl-dialog-input" type="text" placeholder="이름을 입력하세요"
+                   onkeydown="if(event.key==='Enter')plDialogConfirm();if(event.key==='Escape')plDialogCancel()">
+            <div class="pl-dialog-btns">
+                <button class="pl-dialog-btn pl-dialog-cancel" onclick="plDialogCancel()">취소</button>
+                <button class="pl-dialog-btn pl-dialog-ok" id="pl-dialog-ok" onclick="plDialogConfirm()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm dialog -->
+    <div id="pl-confirm-overlay" onclick="plConfirmCancel()">
+        <div id="pl-confirm" onclick="event.stopPropagation()">
+            <div class="pl-dialog-title" id="pl-confirm-title">삭제하시겠어요?</div>
+            <div class="pl-confirm-msg" id="pl-confirm-msg"></div>
+            <div class="pl-dialog-btns">
+                <button class="pl-dialog-btn pl-dialog-cancel" onclick="plConfirmCancel()">취소</button>
+                <button class="pl-dialog-btn pl-dialog-ok pl-dialog-danger" id="pl-confirm-ok" onclick="plConfirmOk()">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Playlist track add modal -->
+    <div id="pl-add-modal-overlay" onclick="plAddModalClose()">
+        <div id="pl-add-modal" onclick="event.stopPropagation()">
+            <div class="pl-add-modal-header">
+                <span class="pl-add-modal-title">곡 추가</span>
+                <button class="pl-add-modal-close" onclick="plAddModalClose()">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="1.5" y1="1.5" x2="10.5" y2="10.5"/>
+                        <line x1="10.5" y1="1.5" x2="1.5" y2="10.5"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="pl-add-modal-search">
+                <svg class="srch-ico" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="1.5" stroke-linecap="round">
+                    <circle cx="6" cy="6" r="4"/>
+                    <path d="M9.5 9.5L13 13"/>
+                </svg>
+                <input class="pl-add-modal-inp" id="pl-add-modal-inp" type="text"
+                       placeholder="추가할 음악 검색..."
+                       oninput="plAddModalSearch(this.value)"
+                       onkeydown="if(event.key==='Enter')plAddModalSearch(this.value,true)">
+            </div>
+            <div id="pl-add-modal-results">
+                <div class="pl-add-modal-hint">검색어를 입력하세요</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <input type="range" id="vol-sl" min="0" max="100" value="80" style="display:none" oninput="setVol(+this.value)">
+    <input type="range" id="echo-sl-bar" min="0" max="100" value="0" style="display:none" oninput="setEcho(+this.value)">
+    <input type="range" id="echo-sl" min="0" max="100" value="0" style="display:none" oninput="setEcho(+this.value)">
+
+    <script src="app.js"></script>
+
+    <!-- AndroidBridge 준비 후 홈 추천 로드 -->
+    <script>
+    (function waitBridge() {
+        // AndroidBridge는 WebView가 완전히 로드된 후 주입됨
+        // app.js의 initYt()가 이미 YT API를 <head>에서 로드했으므로
+        // 브릿지만 준비되면 loadRec 호출 가능
+        function tryLoad() {
+            if (typeof window.AndroidBridge !== 'undefined' &&
+                typeof window.loadRec === 'function') {
+                loadRec('pop music 2024 official mv', 'rec-row');
+                loadRec('kpop 2024 mv official', 'hot-row');
+            } else {
+                setTimeout(tryLoad, 150);
+            }
+        }
+        tryLoad();
+    })();
+    </script>
+
+</body>
+</html>
